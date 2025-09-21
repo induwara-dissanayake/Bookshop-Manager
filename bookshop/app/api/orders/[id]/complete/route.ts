@@ -115,9 +115,20 @@ export async function POST(
       })
     })
 
+    // Check final order status after transaction
+    const remainingPending = await prisma.orderDetail.count({
+      where: {
+        orderId: orderId,
+        status: 0
+      }
+    })
+
     return NextResponse.json({ 
       success: true,
-      message: 'Payment completed successfully'
+      message: 'Payment completed successfully',
+      remainingPendingBooks: remainingPending,
+      completedBooks: selectedBooks,
+      orderFullyCompleted: remainingPending === 0
     })
   } catch (error) {
     console.error('Error completing payment:', error)
