@@ -1,0 +1,131 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Author {
+  id    Int    @id @default(autoincrement()) @map("author_id")
+  name  String @map("author_name")
+  
+  books Book[]
+  
+  @@index([name])
+  @@map("author")
+}
+
+model Book {
+  id       Int    @id @default(autoincrement()) @map("book_id")
+  name     String @map("book_name")
+  authorId Int    @map("author_id")
+  authorName String @map("author_name")
+  isbn     String
+  price    Int
+  qty      Int @default(0)
+  
+  author      Author        @relation(fields: [authorId], references: [id])
+  orderDetails OrderDetail[]
+  
+  @@index([name])
+  @@index([authorName])
+  @@index([isbn])
+  @@index([authorId])
+  @@map("book")
+}
+
+model Customer {
+  id             Int      @id @default(autoincrement()) @map("customer_id")
+  name           String   @map("customer_name")
+  contact        String
+  registrationNo String   @map("registation_no")
+  date           DateTime @db.Date
+  
+  orders       Order[]
+  orderDetails OrderDetail[]
+  loans        Loan[]
+  payments     Payment[]
+  
+  @@index([name])
+  @@index([contact])
+  @@index([registrationNo])
+  @@map("customer")
+}
+
+model Order {
+  id         Int       @id @default(autoincrement()) @map("order_id")
+  customerId Int       @map("customer_id")
+  customerName String  @map("customer_name")
+  orderDate  DateTime  @map("order_date") @db.Date
+  returnDate DateTime? @map("return_date") @db.Date
+  status     Int       @default(0)
+  
+  customer     Customer      @relation(fields: [customerId], references: [id])
+  orderDetails OrderDetail[]
+  payments     Payment[]
+  
+  @@index([customerId])
+  @@index([customerName])
+  @@index([status])
+  @@index([orderDate])
+  @@map("orders")
+}
+
+model OrderDetail {
+  orderId    Int    @map("order_id")
+  bookId     Int    @map("book_id")
+  customerId Int    @map("customer_id")
+  bookName   String @map("book_name")
+  authorName String @map("author_name")
+  status     Int    @default(0)
+  
+  order    Order    @relation(fields: [orderId], references: [id])
+  book     Book     @relation(fields: [bookId], references: [id])
+  customer Customer @relation(fields: [customerId], references: [id])
+  
+  @@id([orderId, bookId])
+  @@index([orderId])
+  @@index([bookId])
+  @@index([customerId])
+  @@index([status])
+  @@map("order_detail")
+}
+
+model Loan {
+  customerId Int @map("customer_id")
+  amount     Int @map("loan")
+  
+  customer Customer @relation(fields: [customerId], references: [id])
+  
+  @@id([customerId])
+  @@map("loan")
+}
+
+model Login {
+  username String @id
+  password String
+  
+  @@map("login")
+}
+
+model Payment {
+  orderId      Int      @map("order_id")
+  customerId   Int      @map("customer_id")
+  customerName String   @map("customer_name")
+  amount       Int      @map("payment")
+  orderDate    DateTime @map("order_date") @db.Date
+  returnDate   DateTime @map("return_date") @db.Date
+  
+  order    Order    @relation(fields: [orderId], references: [id])
+  customer Customer @relation(fields: [customerId], references: [id])
+  
+  @@id([orderId, customerId])
+  @@map("payment")
+}
+
+
