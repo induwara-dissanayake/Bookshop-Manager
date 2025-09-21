@@ -31,8 +31,10 @@ export async function GET(request: NextRequest) {
 
     const response = NextResponse.json({ authors, total })
 
-    // Cache authors for 10 minutes (they don't change often)
-    response.headers.set('Cache-Control', 'public, s-maxage=600, stale-while-revalidate=1200')
+    // Prevent caching to ensure real-time updates
+    response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate')
+    response.headers.set('Pragma', 'no-cache')
+    response.headers.set('Expires', '0')
 
     return response
   } catch (error) {

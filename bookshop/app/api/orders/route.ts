@@ -180,9 +180,10 @@ export async function GET(request: NextRequest) {
       },
     })
 
-    // Cache for 2 minutes for non-search queries, 30 seconds for search queries
-    const cacheTime = search ? 30 : 120
-    response.headers.set('Cache-Control', `public, s-maxage=${cacheTime}, stale-while-revalidate=${cacheTime * 2}`)
+    // Prevent caching to ensure real-time updates
+    response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate')
+    response.headers.set('Pragma', 'no-cache')
+    response.headers.set('Expires', '0')
 
     return response
   } catch (error) {

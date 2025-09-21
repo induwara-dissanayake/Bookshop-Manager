@@ -36,7 +36,12 @@ export default function CustomerHistoryPage({ params }: { params: { id: string }
     const fetchCustomer = useCallback(async () => {
         setCustomerLoading(true)
         try {
-            const res = await fetch(`/api/customers/${params.id}`)
+            const res = await fetch(`/api/customers/${params.id}?t=${Date.now()}`, {
+                headers: {
+                    'Cache-Control': 'no-cache, no-store, must-revalidate',
+                    'Pragma': 'no-cache'
+                }
+            })
             if (res.ok) {
                 const data = await res.json()
                 setCustomer(data.customer)
@@ -51,7 +56,12 @@ export default function CustomerHistoryPage({ params }: { params: { id: string }
     const fetchHistory = useCallback(async () => {
         setLoading(true)
         try {
-            const res = await fetch(`/api/customers/${params.id}/history?search=${encodeURIComponent(search)}`)
+            const res = await fetch(`/api/customers/${params.id}/history?search=${encodeURIComponent(search)}&t=${Date.now()}`, {
+                headers: {
+                    'Cache-Control': 'no-cache, no-store, must-revalidate',
+                    'Pragma': 'no-cache'
+                }
+            })
             const data = await res.json()
             const items = (data.history || []).map((d: any) => ({
                 orderId: d.orderId,

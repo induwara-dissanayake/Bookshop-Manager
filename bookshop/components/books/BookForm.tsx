@@ -128,7 +128,13 @@ export default function BookForm({ book, authors, onSubmit, onCancel }: BookForm
     const t = setTimeout(async () => {
       try {
         setIsSearchingNames(true)
-        const res = await fetch(`/api/books?page=1&limit=5&search=${encodeURIComponent(q)}`, { cache: 'no-store' })
+        const res = await fetch(`/api/books?page=1&limit=5&search=${encodeURIComponent(q)}&t=${Date.now()}`, { 
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache'
+          }
+        })
         if (res.ok) {
           const data = await res.json()
           setNameSuggestions(Array.isArray(data.books) ? data.books : [])

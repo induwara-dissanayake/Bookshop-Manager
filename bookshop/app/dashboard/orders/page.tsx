@@ -49,8 +49,11 @@ export default function OrdersPage() {
         params.append('_t', Date.now().toString())
       }
 
-      const response = await fetch(`/api/orders?${params}`, {
-        headers: forceRefresh ? { 'Cache-Control': 'no-cache' } : {}
+      const response = await fetch(`/api/orders?${params}&t=${Date.now()}`, {
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache'
+        }
       })
       if (response.ok) {
         const data = await response.json()
@@ -75,9 +78,13 @@ export default function OrdersPage() {
 
   const handleCreateOrder = async (orderData: any) => {
     try {
-      const response = await fetch('/api/orders', {
+      const response = await fetch(`/api/orders?t=${Date.now()}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache'
+        },
         body: JSON.stringify(orderData),
       })
 

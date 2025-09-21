@@ -79,10 +79,12 @@ export default function AuthorsPage() {
 
   const handleAddAuthor = async (authorData: Omit<Author, 'id' | '_count'>) => {
     try {
-      const response = await fetch('/api/authors', {
+      const response = await fetch(`/api/authors?t=${Date.now()}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache'
         },
         body: JSON.stringify(authorData),
       })
@@ -104,10 +106,12 @@ export default function AuthorsPage() {
     if (!editingAuthor) return
 
     try {
-      const response = await fetch(`/api/authors/${editingAuthor.id}`, {
+      const response = await fetch(`/api/authors/${editingAuthor.id}?t=${Date.now()}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache'
         },
         body: JSON.stringify(authorData),
       })
@@ -128,8 +132,12 @@ export default function AuthorsPage() {
 
   const handleDeleteAuthor = async (id: number) => {
     try {
-      const response = await fetch(`/api/authors/${id}`, {
+      const response = await fetch(`/api/authors/${id}?t=${Date.now()}`, {
         method: 'DELETE',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache'
+        }
       })
 
       if (response.ok) {

@@ -89,8 +89,12 @@ export default function CustomersPage() {
     if (!confirm('Are you sure you want to delete this customer?')) return
 
     try {
-      const response = await fetch(`/api/customers/${customerId}`, {
+      const response = await fetch(`/api/customers/${customerId}?t=${Date.now()}`, {
         method: 'DELETE',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache'
+        }
       })
 
       if (response.ok) {

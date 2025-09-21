@@ -30,7 +30,12 @@ export default function FinancePage() {
   const fetchDailyData = useCallback(async () => {
     setLoading(true)
     try {
-      const response = await fetch(`/api/finance/daily?month=${selectedMonth}&year=${selectedYear}`)
+      const response = await fetch(`/api/finance/daily?month=${selectedMonth}&year=${selectedYear}&t=${Date.now()}`, {
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache'
+        }
+      })
       const data = await response.json()
       setDailyData(data.payments || [])
     } catch (error) {
@@ -43,7 +48,12 @@ export default function FinancePage() {
   const fetchMonthlyData = useCallback(async () => {
     setLoading(true)
     try {
-      const response = await fetch(`/api/finance/monthly?year=${selectedYear}`)
+      const response = await fetch(`/api/finance/monthly?year=${selectedYear}&t=${Date.now()}`, {
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache'
+        }
+      })
       const data = await response.json()
       setMonthlyData(data.payments || [])
     } catch (error) {

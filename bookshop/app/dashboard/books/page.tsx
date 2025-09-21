@@ -65,7 +65,12 @@ export default function BooksPage() {
 
   const fetchAuthors = async () => {
     try {
-      const response = await fetch('/api/authors')
+      const response = await fetch(`/api/authors?t=${Date.now()}`, {
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache'
+        }
+      })
       if (response.ok) {
         const data = await response.json()
         setAuthors(data)
@@ -104,8 +109,12 @@ export default function BooksPage() {
     if (!confirm('Are you sure you want to delete this book?')) return
 
     try {
-      const response = await fetch(`/api/books/${bookId}`, {
+      const response = await fetch(`/api/books/${bookId}?t=${Date.now()}`, {
         method: 'DELETE',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache'
+        }
       })
 
       if (response.ok) {

@@ -34,8 +34,10 @@ export async function GET(
 
     const response = NextResponse.json({ customer })
 
-    // Cache individual customer for 10 minutes
-    response.headers.set('Cache-Control', 'public, s-maxage=600, stale-while-revalidate=1200')
+    // Prevent caching to ensure real-time updates
+    response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate')
+    response.headers.set('Pragma', 'no-cache')
+    response.headers.set('Expires', '0')
 
     return response
   } catch (error) {
