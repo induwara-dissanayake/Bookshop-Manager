@@ -50,7 +50,12 @@ export default function OrderDetails({ isOpen, onClose, orderId }: OrderDetailsP
 
     setLoading(true)
     try {
-      const response = await fetch(`/api/orders/${orderId}`)
+      const response = await fetch(`/api/orders/${orderId}?t=${Date.now()}`, {
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache'
+        }
+      })
       if (response.ok) {
         const data = await response.json()
         setOrderData(data.order)
@@ -107,43 +112,39 @@ export default function OrderDetails({ isOpen, onClose, orderId }: OrderDetailsP
 
     setCompleting(true)
     
+    // Store selected books for API call
+    const booksToComplete = [...selectedBooks]
+    
+    // Reset selections immediately (before API call)
+    setSelectedBooks([])
+    setSelectAll(false)
+    
     // Optimistic update - immediately update the UI
     const optimisticOrderData = {
       ...orderData,
       orderDetails: orderData.orderDetails.map(detail => ({
         ...detail,
-        status: selectedBooks.includes(detail.bookId) ? 1 : detail.status
+        status: booksToComplete.includes(detail.bookId) ? 1 : detail.status
       }))
     }
     setOrderData(optimisticOrderData)
-    
-    // Reset selections immediately
-    setSelectedBooks([])
-    setSelectAll(false)
 
     try {
-      const response = await fetch(`/api/orders/${orderId}/complete`, {
+      const response = await fetch(`/api/orders/${orderId}/complete?t=${Date.now()}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache'
         },
         body: JSON.stringify({
-          selectedBooks,
+          selectedBooks: booksToComplete,
           currentPayment: calculateCurrentPayment()
         }),
       })
 
       if (response.ok) {
         const result = await response.json()
-        
-        // Show success message
-        const completedCount = selectedBooks.length
-        const message = result.orderFullyCompleted 
-          ? `Order completed! All ${completedCount} books processed.`
-          : `${completedCount} book(s) processed. ${result.remainingPendingBooks} remaining.`
-        
-        // You can replace this alert with a toast notification later
-        alert(message)
         
         // Check if order is fully completed
         if (result.orderFullyCompleted) {
@@ -303,7 +304,7 @@ export default function OrderDetails({ isOpen, onClose, orderId }: OrderDetailsP
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
                   )}
-                  <span>{completing ? 'Processing Payment...' : `Complete Payment ($${currentPayment.toFixed(2)})`}</span>
+                  <span>{completing ? 'Processing...' : 'Complete Payment'}</span>
                 </button>
               </div>
             )}
