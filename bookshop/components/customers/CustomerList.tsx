@@ -42,7 +42,10 @@ export default function CustomerList({
   onPageChange 
 }: CustomerListProps) {
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+    // Create date object and add timezone offset to prevent day shifting
+    const date = new Date(dateString)
+    const localDate = new Date(date.getTime() + (date.getTimezoneOffset() * 60000))
+    return localDate.toLocaleDateString('en-LK', {
       year: 'numeric',
       month: 'short',
       day: 'numeric'

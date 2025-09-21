@@ -273,11 +273,15 @@ export default function CustomerHistoryPage({ params }: { params: { id: string }
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                            {h.orderDate ? new Date(h.orderDate).toLocaleDateString('en-US', {
-                                                year: 'numeric',
-                                                month: 'short',
-                                                day: 'numeric'
-                                            }) : '-'}
+                                            {h.orderDate ? (() => {
+                                                const date = new Date(h.orderDate)
+                                                const localDate = new Date(date.getTime() + (date.getTimezoneOffset() * 60000))
+                                                return localDate.toLocaleDateString('en-LK', {
+                                                    year: 'numeric',
+                                                    month: 'short',
+                                                    day: 'numeric'
+                                                })
+                                            })() : '-'}
                                         </td>
                                     </tr>
                                 ))

@@ -54,11 +54,18 @@ export async function GET(
 
     // Calculate payment details based on day difference (inclusive counting)
     const pendingBooks = order.orderDetails.filter(detail => detail.status === 0)
+    
+    // Use proper date calculation to avoid timezone issues
     const currentDate = new Date()
     const orderDate = new Date(order.orderDate)
-    const timeDiff = currentDate.getTime() - orderDate.getTime()
+    
+    // Calculate days using date-only comparison (ignore time)
+    const currentDateOnly = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate())
+    const orderDateOnly = new Date(orderDate.getFullYear(), orderDate.getMonth(), orderDate.getDate())
+    
+    const timeDiff = currentDateOnly.getTime() - orderDateOnly.getTime()
     const daysDiffExclusive = Math.floor(timeDiff / (1000 * 3600 * 24))
-    const daysDiff = daysDiffExclusive + 1 // Include the order day as day 1
+    const daysDiff = Math.max(1, daysDiffExclusive + 1) // Ensure minimum 1 day, include the order day
 
     let paymentPerBook: number
     if (daysDiff <= 14) {
